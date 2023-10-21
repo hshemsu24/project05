@@ -50,7 +50,7 @@ ul{
 }
 
 img{
-  width: 6em;
+  height: 10em;
 }
 
 
@@ -75,34 +75,27 @@ body {
 
 /* Header Styles */
 .header {
-  background-color: #000000;
-  color: white;
-  padding: 30px;
+  color: rgb(0, 0, 0);
+  padding: 10px;
   text-align: center;
 }
 
 .header h1 {
-  font-size: 34px;
+  font-size: 50px;
 }
 
 .header h4 {
   font-size: 18px;
 }
 
-/* Main Content Styles */
-.main-content {
-  max-width: 1200px;
+.main_content {
+  max-width: 1500px;
   margin: 0 auto;
   padding: 20px;
-  
-   
 }
+
 .filters{
-  margin: 1em;
-  background-color: #ffffff;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  width: 60em;
+  width: 80em;
   display: inline-block;
 }
 /* Form and Input Styles */
@@ -111,13 +104,13 @@ input[type="text"] {
   padding: 10px;
   margin: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 /* Button Styles */
 button {
-  background-color: #007bff;
-  color: white;
+  background-color: #000000;
+  color: rgb(255, 255, 255);
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -125,14 +118,14 @@ button {
 }
 
 select{
+  padding: 10px;
   margin: 10px;
-
-
+  border: 1px solid #ddd;
+  border-radius: 12px;
 }
 
 /* Card Container Styles */
 .dog-card-container {
-  background-color: rgb(255, 255, 255);
   display: flex;
   flex-wrap: wrap;
   margin-top: 20px;
@@ -140,11 +133,11 @@ select{
 }
 
 .dog-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background: radial-gradient(rgb(213, 218, 220), rgb(219, 150, 207));  
+  border: 1px solid #000000;
   padding: 10px;
   margin: 10px;
-  text-align: center;
+  align-self: center;
 }
 
 ul {
@@ -153,6 +146,12 @@ ul {
   justify-content: center;
   align-content: center;
   
+}
+
+p {
+  margin: 10px;
+  font-size: 17px;
+  font-family: 'Arial', sans-serif;
 }
 
 /* Responsive Styles */

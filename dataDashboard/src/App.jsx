@@ -9,7 +9,7 @@ const App = () => {
   const [dogs, setDogs] = useState([]);
   const [filteredDogs, setFilteredDogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBreed, setSelectedBreed] = useState('All'); // Initialize with 'All'
+  const [selectedBreed, setSelectedBreed] = useState('All'); 
   const [selectedHeight, setSelectedHeight] = useState('All');
   const [selectedWeight, setSelectedWeight] = useState('All');
 
@@ -17,11 +17,10 @@ const App = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(`${dogAPI}?has_breeds=1&limit=50&api_key=${apiKey}`);
+        const response = await fetch(`${dogAPI}?has_breeds=1&limit=20&api_key=${apiKey}`);
         const data = await response.json();
         setDogs(data);
         setFilteredDogs(data);
-        console.log('Data fetched:', data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -73,6 +72,35 @@ const App = () => {
 
   const mostCommonBreed = getMostCommonBreed();
 
+  const dogsToAdd = 5; // Define the number of dogs to add with each click
+
+  const fetchAdditionalDogs = async () => {
+    try {
+      const response = await fetch(
+        `${dogAPI}?has_breeds=1&limit=${dogsToAdd}&api_key=${apiKey}`
+      );
+      const data = await response.json();
+      const newDogs = [...dogs, ...data]; // Combine new data with the existing dogs
+      setDogs(newDogs);
+      // Apply the same filter to the updated list
+      const filteredResults = newDogs.filter((dog) => {
+        return (
+          (dog.breeds[0].name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === '') &&
+          (selectedBreed === 'All' || dog.breeds[0].name === selectedBreed) &&
+          (selectedHeight === 'All' || dog.breeds[0].height.imperial.toLowerCase().includes(selectedHeight.toLowerCase())) &&
+          (selectedWeight === 'All' || dog.breeds[0].weight.imperial.toLowerCase().includes(selectedWeight.toLowerCase()))
+        );
+      });
+      setFilteredDogs(filteredResults);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleAddMoreDogs = () => {
+    fetchAdditionalDogs();
+  };
+
   return (
     <div className="main_container">
       <div className="header">
@@ -81,15 +109,12 @@ const App = () => {
       </div>
 
       <div>
-        <h4>Total Dogs: {totalDogs}</h4>
-        <h4>Total Filtered Dogs: {totalFilteredDogs}</h4>
-        <h4>Most Common Breed: {mostCommonBreed}</h4> {/* Display the most common breed */}
-
-
+        <h2>Total Dogs: {totalDogs}</h2>
+        <h2>Total Filtered Dogs: {totalFilteredDogs}</h2>
+        <h2>Most Common Breed: {mostCommonBreed}</h2> {/* Display the most common breed */}
       </div>
 
       <div className="main_content">
-        
         <div className="filters">
           <input
             type="text"
@@ -126,6 +151,8 @@ const App = () => {
           </select>
 
           <button onClick={handleSearch}>Search</button>
+          <button onClick={handleAddMoreDogs}>Add {dogsToAdd} More Dogs</button>
+
         </div>
         
         <div className="dog-card-container">
