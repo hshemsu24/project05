@@ -10,14 +10,18 @@ const App = () => {
   const [filteredDogs, setFilteredDogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBreed, setSelectedBreed] = useState('All'); // Initialize with 'All'
+  const [selectedHeight, setSelectedHeight] = useState('All');
+  const [selectedWeight, setSelectedWeight] = useState('All');
+
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(`${dogAPI}?has_breeds=1&limit=10&api_key=${apiKey}`);
+        const response = await fetch(`${dogAPI}?has_breeds=1&limit=50&api_key=${apiKey}`);
         const data = await response.json();
         setDogs(data);
         setFilteredDogs(data);
+        console.log('Data fetched:', data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -31,12 +35,16 @@ const App = () => {
 
   // Create a list of available dog breeds
   const availableBreeds = [...new Set(dogs.map((dog) => dog.breeds[0].name))];
+  const availableHeights = [...new Set(dogs.map((dog) => dog.breeds[0].height.imperial))];
+  const availableWeights = [...new Set(dogs.map((dog) => dog.breeds[0].weight.imperial))];
 
   const handleSearch = () => {
     const filteredResults = dogs.filter((dog) => {
       return (
         (dog.breeds[0].name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === '') &&
-        (selectedBreed === 'All' || dog.breeds[0].name === selectedBreed)
+        (selectedBreed === 'All' || dog.breeds[0].name === selectedBreed) &&
+        (selectedHeight === 'All' || dog.breeds[0].height.imperial.toLowerCase().includes(selectedHeight.toLowerCase())) &&
+      (selectedWeight === 'All' || dog.breeds[0].weight.imperial.toLowerCase().includes(selectedWeight.toLowerCase()))
       );
     });
     setFilteredDogs(filteredResults);
@@ -46,12 +54,40 @@ const App = () => {
     setSelectedBreed(e.target.value);
   };
 
+  const getMostCommonBreed = () => {
+    // Create an object to count the occurrences of each breed
+    if(dogs.length>0){
+      const breedCount = dogs.reduce((count, dog) => {
+      const breed = dog.breeds[0].name;
+      count[breed] = (count[breed] || 0) + 1;
+      return count;
+    }, {});
+
+    // Find the breed with the highest count
+    const mostCommonBreed = Object.keys(breedCount).reduce((a, b) => (breedCount[a] > breedCount[b] ? a : b));
+
+    return mostCommonBreed;
+    }
+    
+  };
+
+  const mostCommonBreed = getMostCommonBreed();
+
   return (
     <div className="main_container">
       <div className="header">
         <h1>Paw-some Dogs!</h1>
         <h4>Discover the coolest dogs in the world!</h4>
       </div>
+
+      <div>
+        <h4>Total Dogs: {totalDogs}</h4>
+        <h4>Total Filtered Dogs: {totalFilteredDogs}</h4>
+        <h4>Most Common Breed: {mostCommonBreed}</h4> {/* Display the most common breed */}
+
+
+      </div>
+
       <div className="main_content">
         
         <div className="filters">
@@ -70,6 +106,25 @@ const App = () => {
               </option>
             ))}
           </select>
+
+          <select value={selectedHeight} onChange={(e) => setSelectedHeight(e.target.value)}>
+            <option value="All">All Heights</option>
+            {availableHeights.map((height) => (
+              <option key={height} value={height}>
+                {height}
+              </option>
+            ))}
+          </select>
+
+          <select value={selectedWeight} onChange={(e) => setSelectedWeight(e.target.value)}>
+            <option value="All">All Weights</option>
+            {availableWeights.map((weight) => (
+              <option key={weight} value={weight}>
+                {weight}
+              </option>
+            ))}
+          </select>
+
           <button onClick={handleSearch}>Search</button>
         </div>
         
