@@ -151,10 +151,10 @@ const App = () => {
           </select>
 
           <button onClick={handleSearch}>Search</button>
-          <button onClick={handleAddMoreDogs}>Add {dogsToAdd} More Dogs</button>
+          
 
         </div>
-        
+        <button onClick={handleAddMoreDogs}>Add {dogsToAdd} More Dogs</button>
         <div className="dog-card-container">
           <ul>
             {filteredDogs.map((dog) => (
