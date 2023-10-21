@@ -1,43 +1,88 @@
-import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import md5 from 'md5'; // Import the md5 library
+import DogCard from './components/DogCard';
 
-function App() {
-  const marvelAPI = 'http://gateway.marvel.com/v1/public/characters';
-  const publicKey = '41af6e47ba1d11f527d42929ed19e4c5'; // Update with your public key
-  const privateKey = '0e217e0052a197b51e70366d8716d465c65640c4'; // Update with your private key
+const App = () => {
+  const dogAPI = 'https://api.thedogapi.com/v1/images/search';
+  const apiKey = 'live_g3s9htKNucTNbUxjq0Umn9VmKQ0x7Wo7BfKgDL0POvLv2HhBgTpLunUaWQoqEVrE';
 
-  // Function to calculate the MD5 hash
-  const generateHash = (ts) => {
-    return md5(ts + privateKey + publicKey);
-  };
-
-  const fetchData = async () => {
-    const ts = new Date().getTime().toString(); // Generate a timestamp
-    const hash = generateHash(ts); // Calculate the hash
-
-    const dataURL = `${marvelAPI}?apikey=${publicKey}&ts=${ts}&hash=${hash}`;
-    try {
-      const response = await fetch(dataURL);
-      const data = await response.json();
-
-      console.log(data);
-      //setData(data);
-    } catch (error) {
-      console.error(error); // Use console.error to log errors
-    }
-  }
+  const [dogs, setDogs] = useState([]);
+  const [filteredDogs, setFilteredDogs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBreed, setSelectedBreed] = useState('All'); // Initialize with 'All'
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(`${dogAPI}?has_breeds=1&limit=10&api_key=${apiKey}`);
+        const data = await response.json();
+        setDogs(data);
+        setFilteredDogs(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
     fetchData();
   }, []);
 
+  const totalDogs = dogs.length;
+  const totalFilteredDogs = filteredDogs.length;
+
+  // Create a list of available dog breeds
+  const availableBreeds = [...new Set(dogs.map((dog) => dog.breeds[0].name))];
+
+  const handleSearch = () => {
+    const filteredResults = dogs.filter((dog) => {
+      return (
+        (dog.breeds[0].name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === '') &&
+        (selectedBreed === 'All' || dog.breeds[0].name === selectedBreed)
+      );
+    });
+    setFilteredDogs(filteredResults);
+  };
+
+  const handleBreedChange = (e) => {
+    setSelectedBreed(e.target.value);
+  };
+
   return (
-    <div>
+    <div className="main_container">
+      <div className="header">
+        <h1>Paw-some Dogs!</h1>
+        <h4>Discover the coolest dogs in the world!</h4>
+      </div>
+      <div className="main_content">
+        
+        <div className="filters">
+          <input
+            type="text"
+            placeholder="Search by breed"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+
+          <select value={selectedBreed} onChange={handleBreedChange}>
+            <option value="All">All Breeds</option>
+            {availableBreeds.map((breed) => (
+              <option key={breed} value={breed}>
+                {breed}
+              </option>
+            ))}
+          </select>
+          <button onClick={handleSearch}>Search</button>
+        </div>
+        
+        <div className="dog-card-container">
+          <ul>
+            {filteredDogs.map((dog) => (
+              <DogCard key={dog.id} dog={dog} />
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default App;
